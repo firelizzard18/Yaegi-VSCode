@@ -1,0 +1,85 @@
+{
+	"name": "yaegi",
+	"displayName": "Yaegi",
+	"description": "Yaegi debugger",
+	"version": "0.0.1",
+	"license": "Apache-2.0",
+	"engines": {
+		"vscode": "^1.58.0"
+	},
+	"categories": [
+		"Debuggers"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"main": "./dist/extension.js",
+	"contributes": {
+		"breakpoints": [
+			{
+				"language": "go"
+			}
+		],
+		"debuggers": [
+			{
+				"type": "yaegi",
+				"label": "Yaegi",
+				"languages": ["go"],
+				"configurationAttributes": {
+					"launch": {
+						"required": [
+							"program"
+						],
+						"properties": {
+							"program": {
+								"type": "string",
+								"description": "Absolute path to a Go file.",
+								"default": "${workspaceFolder}/${command:AskForProgramName}"
+							},
+							"cwd": {
+								"type": "string",
+								"description": "Directory to execute the program in",
+								"default": "${workspaceFolder}"
+							},
+							"args": {
+								"type": "array",
+								"description": "Command line arguments passed to the program.",
+								"items": {
+									"type": "string"
+								},
+								"default": []
+							},
+							"env": {
+								"type": "object",
+								"description": "Additional environment variables to pass to the debugging (and debugged) process.",
+								"default": {}
+							},
+							"showProtocolLog": {
+								"type": "boolean",
+								"description": "Show a log of DAP requests, events, and responses",
+								"default": false
+							}
+						}
+					}
+				}
+			}
+		]
+	},
+	"scripts": {
+		"bundle": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+		"compile": "yarn run bundle --sourcemap",
+		"watch": "yarn run bundle --sourcemap --watch",
+		"lint": "eslint src --ext ts",
+		"vscode:prepublish": "yarn run bundle --minify"
+	},
+	"devDependencies": {
+		"@types/node": "14.x",
+		"@types/vscode": "^1.58.0",
+		"@typescript-eslint/eslint-plugin": "^4.26.0",
+		"@typescript-eslint/parser": "^4.26.0",
+		"esbuild": "^0.12.15",
+		"eslint": "^7.27.0",
+		"typescript": "^4.3.2",
+		"vsce": "^1.95.1"
+	}
+}
