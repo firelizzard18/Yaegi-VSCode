@@ -36,7 +36,7 @@ interface LaunchConfiguration extends vscode.DebugConfiguration {
 
 class YaegiDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
 	resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration> {
-		if (config.program)
+		if (config.program || config.request == 'attach')
 			return config;
 
 		if (Object.keys(config).length > 0 && !config.program)
@@ -61,6 +61,12 @@ class YaegiDebugConfigurationProvider implements vscode.DebugConfigurationProvid
 
 class YaegiDebugAdapterDescriptorFactory implements vscode.DebugAdapterDescriptorFactory {
 	async createDebugAdapterDescriptor(session: vscode.DebugSession): Promise<vscode.DebugAdapterDescriptor|undefined> {
+		if (session.configuration.request == 'attach') {
+			return new vscode.DebugAdapterNamedPipeServer(session.configuration.socket);
+		}
+
+		const modeStdio = false;
+
 		const config = session.configuration as LaunchConfiguration;
 		const args = [config.program, '--', ...(config.args || [])];
 		if (config.showProtocolLog) args.unshift('--log', '-');
@@ -78,6 +84,7 @@ class YaegiDebugAdapterDescriptorFactory implements vscode.DebugAdapterDescripto
 			stdio: 'pipe',
 		});
 
+		if (!modeStdio) proc.stdout.on('data', b => output().append(b.toString()));
 		proc.stderr.on('data', b => output().append(b.toString()));
 
 		let stop: () => void;

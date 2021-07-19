@@ -26,6 +26,17 @@
 				"label": "Yaegi",
 				"languages": ["go"],
 				"configurationAttributes": {
+					"attach": {
+						"required": [
+							"socket"
+						],
+						"properties": {
+							"socket": {
+								"type": "string",
+								"description": "Path to the debug socket"
+							}
+						}
+					},
 					"launch": {
 						"required": [
 							"program"
